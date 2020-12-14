@@ -5,15 +5,16 @@ public class Cow{
     private boolean rested;
 
     public static void main(String[] args){
-        Cow mycow = new Cow(1000);
-        System.out.println(mycow);
-        mycow.milkCow();
-        System.out.println(mycow.rest());
-        mycow.feed(70);
-        System.out.println(mycow.moo());
-        System.out.println(mycow.rest());
-        System.out.println(mycow);
-        System.out.println(mycow.moo());
+        // Cow mycow = new Cow(1000);
+        // System.out.println(mycow);
+        // mycow.milkCow();
+        // System.out.println(mycow.rest());
+        // mycow.feed(70);
+        // System.out.println(mycow.moo());
+        // System.out.println(mycow.rest());
+        // System.out.println(mycow);
+        // System.out.println(mycow.moo());
+        // mycow = new Cow(1000);
     }
 
     public Cow(int milk_capacity){
@@ -21,6 +22,7 @@ public class Cow{
         this.hunger = 100;
         this.milk = 100;
         this.milk_capacity = milk_capacity;
+        this.instances += 1;
     }
 
     public String moo(){
