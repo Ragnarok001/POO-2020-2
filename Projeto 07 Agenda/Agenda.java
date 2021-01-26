@@ -1,12 +1,18 @@
 import java.util.*;
 
+
 class Phone{
     private String id;
     private String number;
 
-    // public Phone(string serial){
-
-    // }
+    public Phone(String serial){
+        String splitted[] = serial.split(":");
+        if(!validate(splitted[1])){
+            System.out.println("Número inválido!");
+        }
+        this.id = splitted[0];
+        this.number = splitted[1];
+    }
     public Phone(String id, String number){
         if(!validate(number)){
             System.out.println("Número inválido!");
