@@ -22,12 +22,11 @@ class Phone{
         return this.number;
     }
     private boolean validate(String number){
-
+        number = number.replaceAll(" ", "");
         if(number.contains("(") || number.contains(")")){
-            String prefix = number.substring(0,3);
-            String prefixcompare = prefix.substring(1,2).replaceAll("\\d", "");
-            if(prefix.charAt(0) != '(' || prefix.charAt(3) != ')') return false;
-            if(prefixcompare.equals("")) return false;
+            String prefix = number.replaceFirst("\\(", "").replaceFirst("\\)", "");
+            prefix = prefix.replaceAll("\\d", "");
+            if(!prefix.equals("")) return false;
         }
         String compare = number.replaceAll("\\d", "").replaceAll("[()]","");
         if(compare.equals("")) return true;
@@ -95,15 +94,28 @@ class Schedule{
          for(int i = 0; i < this.contacts.size(); i++){
              if(this.contacts.get(i) != null && this.contacts.get(i).getName().equals(name)){
                  for(Phone fn : phones)
-                    this.contacts.get(i).addPhone(fn.getId(), fn.getNumber());
+                    if(fn.getId() != null && fn.getNumber() != null)
+                        this.contacts.get(i).addPhone(fn.getId(), fn.getNumber());
                 return true;
              }
          }
          this.contacts.add(new Contact(name));
-         for(Phone fn : phones){
-            this.contacts.get(this.contacts.size()-1).addPhone(fn.getId(), fn.getNumber());
-         }
+         for(Phone fn : phones)
+            if(fn.getId() != null && fn.getNumber() != null)
+                this.contacts.get(this.contacts.size()-1).addPhone(fn.getId(), fn.getNumber());
          return true;
+    }
+    public boolean rmContact(String name){
+        int i = 0;
+        for(Contact contact : this.contacts){
+            if(contact.getName().equals(name)){
+                this.contacts.remove(i);
+                System.out.println("Removido com sucesso!");
+                return true;
+            }
+            i++;
+        }
+        return false;
     }
     public boolean rmPhone(String name, int index){
         for(int i = 0; i < this.contacts.size(); i++){
@@ -119,25 +131,13 @@ class Schedule{
         System.out.println("Não foi possível localizar o contato!");
         return false;
     }
-    public boolean rmContact(String name){
-        int i = 0;
-        for(Contact contact : this.contacts){
-            if(contact.getName().equals(name)){
-                this.contacts.remove(i);
-                System.out.println("Removido com sucesso!");
-                return true;
-            }
-            i++;
-        }
-        return false;
-    }
     public ArrayList<Contact> search(String pattern){
         ArrayList<Contact> response = new ArrayList<>();
         for(Contact ct : this.contacts){
             if(ct.toString().contains(pattern))
                 response.add(ct);
         }
-        return response;
+        return (response.isEmpty() ? null : response);
     }
     public ArrayList<Contact> getContacts(){
         return this.contacts;
@@ -151,6 +151,72 @@ class Schedule{
         return response;
     }
     public static void main(String args[]){
-        
+        Schedule schedule;
+        Scanner scan = new Scanner(System.in);
+        while(true){
+            System.out.println("Você deseja *criar* uma agenda ou *sair*?");
+            String test = scan.nextLine().toLowerCase();
+            if(test.equals("sair")) return;
+            else if(test.equals("criar")){
+                schedule = new Schedule();
+                while(true){
+                    System.out.println("O que deseja fazer? (*Adicionar* contato, *remover* contato,"
+                    + "remover *fone*, *ver* contatos, *buscar* um contato por número ou nome ou *voltar*)");
+                    String option = scan.nextLine().toLowerCase();
+                    if(option.equals("voltar")) break;
+                    else if(option.equals("ver")) System.out.print(schedule);
+                    else if(option.equals("adicionar")){
+                        System.out.print("Digite o nome do contato: (Digite o nome de um contato já existente "
+                        + "para adicionar outro fone ao mesmo) ");
+                        String name = scan.nextLine();
+                        System.out.print("Digite a quantidade de números que deseja vincular a esse contato: ");
+                        int quantity = scan.nextInt();
+                        scan.nextLine();
+                        ArrayList<Phone> phones = new ArrayList<>();
+                        while(quantity-- > 0){
+                            System.out.print("Digite um identificador para o número: ");
+                            String label = scan.nextLine();
+                            System.out.print("Digite o número do telefone: ");
+                            String phone = scan.nextLine();
+                            phones.add(new Phone(label,phone));
+                        }
+                        schedule.addContact(name, phones);
+                    } else if(option.equals("remover")){
+                        System.out.print("Digite o nome do contato que deseja remover: ");
+                        String name = scan.nextLine();
+                        schedule.rmContact(name);
+                    } else if(option.equals("fone")){
+                        System.out.print("Digite o nome do contato que deseja remover algum número: ");
+                        String name = scan.nextLine();
+                        System.out.print("Digite a quantidade de números que deseja remover: ");
+                        int quantity = scan.nextInt();
+                        scan.nextLine();
+                        while(quantity-- > 0){
+                            System.out.print("Digite o índice do número que deseja remover: ");
+                            int index = scan.nextInt();
+                            schedule.rmPhone(name, index);
+                        }
+                        scan.nextLine();
+                    }else if(option.equals("buscar")){
+                        System.out.print("Digite um nome ou número de um contato para buscar: ");
+                        String pattern = scan.nextLine();
+                        if(pattern.toLowerCase().equals("voltar")) break;
+                        ArrayList<Contact> tmp = schedule.search(pattern);
+                        while(true){
+                            if(tmp == null){
+                                System.out.print("Contato não encontrado! Digite novamente ou digite *voltar* para retornar ao menu: ");
+                                pattern = scan.nextLine();
+                                if(pattern.toLowerCase().equals("voltar")) break;
+                            } else break;
+                        }
+                        if(tmp != null)
+                            for(Contact ct : tmp)
+                                System.out.println(ct);
+                    } else{
+                        System.out.println("Huh? Digite alguma das opções entre asterisco!");
+                    }
+                }
+            } else System.out.println("Huh? Digite alguma das opções entre asterisco!");
+        }
     }
 }
