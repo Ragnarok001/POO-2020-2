@@ -137,7 +137,7 @@ class Game{
         while(true){
             System.out.println("Você deseja *criar* um pet ou *sair*?");
             String test = scan.nextLine().toLowerCase();
-            if(test.equals("sair")) return;
+            if(test.equals("sair")) break;
             else if(test.equals("criar")){
                 System.out.println("Olá, crie um pet para começar a jogar. Diga seus atributos(números inteiros):");
                 System.out.print("Energia: ");
@@ -169,7 +169,6 @@ class Game{
             }
             else System.out.println("??");
         }
-        
-
+        scan.close();
     }
 } 

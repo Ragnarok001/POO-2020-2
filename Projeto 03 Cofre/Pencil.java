@@ -118,5 +118,6 @@ public class Pencil{
                 System.out.println("Digite sair para sair, inserir para inserir grafite, remover para remover grafite e ver para ver lapiseira");
             }
         }
+        input.close();
     }
 }

@@ -162,7 +162,7 @@ class Schedule{
         while(true){
             System.out.println("Você deseja *criar* uma agenda ou *sair*?");
             String test = scan.nextLine().toLowerCase();
-            if(test.equals("sair")) return;
+            if(test.equals("sair")) break;
             else if(test.equals("criar")){
                 schedule = new Schedule();
                 while(true){
@@ -224,5 +224,6 @@ class Schedule{
                 }
             } else System.out.println("Huh? Digite alguma das opções entre asterisco!");
         }
+        scan.close();
     }
 }

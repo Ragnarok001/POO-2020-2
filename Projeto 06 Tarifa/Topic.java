@@ -98,7 +98,7 @@ public class Topic{
         while(true){
             System.out.println("Você deseja *criar* uma topic ou *sair*?");
             String test = scan.nextLine().toLowerCase();
-            if(test.equals("sair")) return;
+            if(test.equals("sair")) break;
             else if(test.equals("criar")){
                 System.out.print("Digite a quantidade de cadeiras: ");
                 int chairs = scan.nextInt();
@@ -130,5 +130,6 @@ public class Topic{
                 }
             }
         }
+        scan.close();
     }
 }

@@ -125,7 +125,7 @@ class JunkFood{
         while(true){
             System.out.println("Você deseja *criar* uma máquina ou *sair*?");
             String test = scan.nextLine().toLowerCase();
-            if(test.equals("sair")) return;
+            if(test.equals("sair")) break;
             else if(test.equals("criar")){
                 System.out.print("Digite a quantidade de espirais: ");
                 int qtdEsp = scan.nextInt();
@@ -180,7 +180,7 @@ class JunkFood{
             }
             else System.out.println("??");
         }
-        
+        scan.close();
 
     }
 }
