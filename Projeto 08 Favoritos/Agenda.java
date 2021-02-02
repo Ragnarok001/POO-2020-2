@@ -46,17 +46,24 @@ class Phone{
 class Contact{
     private String name;
     private ArrayList<Phone> phones;
+    // private boolean favorite;
 
     public Contact(String name){
         this.name = name;
         phones = new ArrayList<>();
     }
+    // public void bookmark(){
+    //     this.favorite = true;
+    // }
     public String getName(){
         return this.name;
     }
     public int getPhonesSize(){
         return this.phones.size();
     }
+    // public boolean isFavorite(){
+    //     return this.favorite;
+    // }
     public boolean addPhone(String id, String number){
         this.phones.add(new Phone(id,number));
         return true;
@@ -87,72 +94,93 @@ class ContactCmp implements Comparator<Contact>{
 }
 
 class Schedule{
-    private ArrayList<Contact> contacts;
+    private TreeMap<String, Contact> contacts;
+    private TreeMap<String, Contact> bookmarks;
 
     public Schedule(){
-        this.contacts = new ArrayList<>();
+        this.contacts = new TreeMap<>();
+        this.bookmarks = new TreeMap<>();
+    }
+    public boolean bookmarkContact(String name){
+        if(this.contacts.containsKey(name)){
+            if(!this.bookmarks.containsKey(name)){
+                bookmarks.put(name, this.contacts.get(name));
+                return true;
+            }
+            System.out.println("Contato já é um favorito!");
+        }
+        System.out.println("Contato não foi encontrado!");
+        return false;
+    }
+    public boolean unBookmarkContact(String name){
+        if(this.bookmarks.containsKey(name)){
+            this.bookmarks.remove(name);
+            System.out.println("Removido com sucesso!");
+            return true;
+        }
+        System.out.println("Não existe um contato favorito com esse nome!");
+        return false;
+    }
+    public ArrayList<Contact> getBookmarkedContacts(){
+        ArrayList bcontacts = new ArrayList(this.bookmarks.values());
+        return bcontacts;
     }
     public boolean addContact(String name, ArrayList<Phone> phones){
         if(name.equals("")){
             System.out.println("Digite um nome para o contato");
             return false;
         }
-         for(int i = 0; i < this.contacts.size(); i++){
-             if(this.contacts.get(i) != null && this.contacts.get(i).getName().equals(name)){
-                 for(Phone fn : phones)
-                    if(fn.getId() != null && fn.getNumber() != null)
-                        this.contacts.get(i).addPhone(fn.getId(), fn.getNumber());
-                return true;
-             }
-         }
-         this.contacts.add(new Contact(name));
+        if(this.contacts.containsKey(name)){
+            for(Phone fn : phones){
+                this.contacts.get(name).addPhone(fn.getId(), fn.getNumber());
+            }
+            return true;
+        }
+         this.contacts.put(name, new Contact(name));
          for(Phone fn : phones)
             if(fn.getId() != null && fn.getNumber() != null)
-                this.contacts.get(this.contacts.size()-1).addPhone(fn.getId(), fn.getNumber());
+                this.contacts.get(name).addPhone(fn.getId(), fn.getNumber());
          return true;
     }
     public boolean rmContact(String name){
-        int i = 0;
-        for(Contact contact : this.contacts){
-            if(contact.getName().equals(name)){
-                this.contacts.remove(i);
-                System.out.println("Removido com sucesso!");
-                return true;
-            }
-            i++;
+        if(this.contacts.containsKey(name)){
+            this.contacts.remove(name);
+            System.out.println("Removido com sucesso!");
+            return true;
         }
         return false;
     }
     public boolean rmPhone(String name, int index){
-        for(int i = 0; i < this.contacts.size(); i++){
-            if(this.contacts.get(i) != null && this.contacts.get(i).getName().equals(name)){
-                if(index < 0 || index >= this.contacts.get(i).getPhonesSize()){
-                    System.out.println("Índice inválido!");
-                    return false;
-                }
-                this.contacts.get(i).rmPhone(index);
-                return true;
+        if(this.contacts.containsKey(name)){
+            if(index < 0 || index >= this.contacts.get(name).getPhonesSize()){
+                System.out.println("Índice inválido!");
+                return false;
             }
+            this.contacts.get(name).rmPhone(index);
+            return true;
         }
         System.out.println("Não foi possível localizar o contato!");
         return false;
     }
     public ArrayList<Contact> search(String pattern){
         ArrayList<Contact> response = new ArrayList<>();
-        for(Contact ct : this.contacts){
+        for(Contact ct : this.contacts.values()){
             if(ct.toString().contains(pattern))
                 response.add(ct);
         }
         return (response.isEmpty() ? null : response);
     }
-    public ArrayList<Contact> getContacts(){
-        return this.contacts;
+    public TreeMap<String,Contact> getContacts(){
+        return this.contacts.values();
     }
     public String toString(){
-        Collections.sort(this.contacts, new ContactCmp());
         String response = "";
-        for(Contact contact : this.contacts){
-            response += contact + "\n";
+        for(Contact contact : this.bookmarks.values()){
+            response += "@ " + contact + "\n";
+        }
+        for(Contact contact : this.contacts.values()){
+            if(!this.bookmarks.containsKey(contact.getName()))
+                response += "- " + contact + "\n";
         }
         return response;
     }
@@ -166,11 +194,16 @@ class Schedule{
             else if(test.equals("criar")){
                 schedule = new Schedule();
                 while(true){
-                    System.out.println("O que deseja fazer? (*Adicionar* contato, *remover* contato,"
-                    + "remover *fone*, *ver* contatos, *buscar* um contato por número ou nome ou *voltar*)");
+                    System.out.println("O que deseja fazer?\n(*Adicionar* contato, *remover* contato,"
+                    + "remover *fone*, *ver* contatos, *buscar* um contato por número ou nome, *favoritar*"
+                    + " um contato, *desfavoritar* um contato, ver *favoritos* ou *voltar*)");
                     String option = scan.nextLine().toLowerCase();
                     if(option.equals("voltar")) break;
                     else if(option.equals("ver")) System.out.print(schedule);
+                    else if(option.equals("favoritos")){
+                        for(Contact contact : schedule.getBookmarkedContacts())
+                            System.out.println(contact);
+                    }
                     else if(option.equals("adicionar")){
                         System.out.print("Digite o nome do contato: (Digite o nome de um contato já existente "
                         + "para adicionar outro fone ao mesmo) ");
@@ -213,12 +246,20 @@ class Schedule{
                                 System.out.print("Contato não encontrado! Digite novamente ou digite *voltar* para retornar ao menu: ");
                                 pattern = scan.nextLine();
                                 if(pattern.toLowerCase().equals("voltar")) break;
-                                tmp = schedule.seach(pattern);
+                                tmp = schedule.search(pattern);
                             } else break;
                         }
                         if(tmp != null)
                             for(Contact ct : tmp)
                                 System.out.println(ct);
+                    } else if(option.equals("favoritar")){
+                        System.out.print("Digite o nome do contato que deseja favoritar: ");
+                        String name = scan.nextLine();
+                        schedule.bookmarkContact(name);
+                    } else if(option.equals("desfavoritar")){
+                        System.out.print("Digite o nome do favorito que deseja desfavoritar: ");
+                        String name = scan.nextLine();
+                        schedule.unBookmarkContact(name);
                     } else{
                         System.out.println("Huh? Digite alguma das opções entre asterisco!");
                     }
