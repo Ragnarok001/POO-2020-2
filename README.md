@@ -7,3 +7,4 @@
 - [Atividade 05](/Projeto%2005%20Contato/JunkFood.java)
 - [Atividade 06](/Projeto%2006%20Tarifa/Topic.java)
 - [Atividade 07](/Projeto%2007%20Agenda/Agenda.java)
+- [Atividade 08](/Projeto%2008%20Favoritos/Agenda.java)
